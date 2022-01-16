@@ -253,7 +253,7 @@ public class XML {
      * @return true if the close tag is processed.
      * @throws JSONException
      */
-    private static boolean parse(XMLTokener x, JSONObject context, String name, XMLParserConfiguration config)
+    public static boolean parse(XMLTokener x, JSONObject context, String name, XMLParserConfiguration config, boolean done, String keyPath, String lastKey)
             throws JSONException {
         char c;
         int i;
@@ -319,7 +319,9 @@ public class XML {
 
             // Close tag </
 
+
             token = x.nextToken();
+
             if (name == null) {
                 throw x.syntaxError("Mismatched close tag " + token);
             }
@@ -329,6 +331,12 @@ public class XML {
             if (x.nextToken() != GT) {
                 throw x.syntaxError("Misshaped close tag");
             }
+//          Note if we have reached our object in question and we have reached the end of that said object
+//          then we can print out the context and be done with it
+            if(done && token.equals(lastKey)){
+                System.out.println(context);
+                System.exit(1);
+            }
             return true;
 
         } else if (token instanceof Character) {
@@ -337,7 +345,29 @@ public class XML {
             // Open tag <
 
         } else {
+//           START
+//           NOTE: this is where the Tagnames are
             tagName = (String) token;
+//           WE CAN DO SOME WORK HERE: check the tagName to see if it's the correct tagname
+            String[] myKeys = keyPath.split("/");
+            if(!myKeys[0].equals("")){
+//              this means we are on the correct path so far
+                if(tagName.equals(myKeys[0])){
+//                   then we need to check if this is the last key, if so, then we need to set done to true
+//                    to signify that we have reached our object
+
+//                  we have found the beginning of the key
+                    if(tagName.equals(lastKey)){
+                        done = true;
+                    }
+
+
+                }
+            }
+            System.out.println(tagName);
+            if(tagName.equals("whatever")){
+                done = true;
+            }
             token = null;
             jsonObject = new JSONObject();
             boolean nilAttributeFound = false;
@@ -381,13 +411,16 @@ public class XML {
                         throw x.syntaxError("Misshaped tag");
                     }
                     if (config.getForceList().contains(tagName)) {
+
                         // Force the value to be an array
                         if (nilAttributeFound) {
                             context.append(tagName, JSONObject.NULL);
                         } else if (jsonObject.length() > 0) {
+
                             context.append(tagName, jsonObject);
                         } else {
                             context.put(tagName, new JSONArray());
+
                         }
                     } else {
                         if (nilAttributeFound) {
@@ -401,6 +434,8 @@ public class XML {
                     return false;
 
                 } else if (token == GT) {
+//                  START2
+//                  NOTE: this seems to be where all the embedded stuff is
                     // Content, between <...> and </...>
                     for (;;) {
                         token = x.nextContent();
@@ -410,6 +445,7 @@ public class XML {
                             }
                             return false;
                         } else if (token instanceof String) {
+//                            NOTE: there is where the strings are found
                             string = (String) token;
                             if (string.length() > 0) {
                                 if(xmlXsiTypeConverter != null) {
@@ -422,8 +458,9 @@ public class XML {
                             }
 
                         } else if (token == LT) {
+//                            NOTE: Nested Element
                             // Nested element
-                            if (parse(x, jsonObject, tagName, config)) {
+                            if (parse(x, jsonObject, tagName, config,done,keyPath, lastKey)) {
                                 if (config.getForceList().contains(tagName)) {
                                     // Force the value to be an array
                                     if (jsonObject.length() == 0) {
@@ -431,6 +468,7 @@ public class XML {
                                     } else if (jsonObject.length() == 1
                                             && jsonObject.opt(config.getcDataTagName()) != null) {
                                         context.append(tagName, jsonObject.opt(config.getcDataTagName()));
+
                                     } else {
                                         context.append(tagName, jsonObject);
                                     }
@@ -444,16 +482,21 @@ public class XML {
                                         context.accumulate(tagName, jsonObject);
                                     }
                                 }
-                                
                                 return false;
                             }
-                        }
+                            }
                     }
+
+
                 } else {
                     throw x.syntaxError("Misshaped tag");
                 }
-            }
+
+            } // here is the end of the  second for loop
+
+
         }
+
     }
 
     /**
@@ -676,7 +719,7 @@ public class XML {
         while (x.more()) {
             x.skipPast("<");
             if(x.more()) {
-                parse(x, jo, null, config);
+                parse(x, jo, null, config,false, "/catalog/book", "hi");
             }
         }
         return jo;
@@ -881,4 +924,5 @@ public class XML {
                         + ">" + string + "</" + tagName + ">";
 
     }
+
 }
