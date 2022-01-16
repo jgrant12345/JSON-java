@@ -355,16 +355,34 @@ public class XML {
                 if(tagName.equals(myKeys[0])){
 //                   then we need to check if this is the last key, if so, then we need to set done to true
 //                    to signify that we have reached our object
-
 //                  we have found the beginning of the key
                     if(tagName.equals(lastKey)){
                         done = true;
+                    } else {
+//                       this is where we iterate to the next key. We haven't found it but we're going to the next
+//                       key
+                        keyPath = "";
+                        for(int j = 1; j < myKeys.length - 1; j++){
+                            keyPath += myKeys[j] + '/';
+                        }
+                        keyPath += myKeys[myKeys.length - 1];
                     }
-
-
                 }
+            } else{
+//              the first character is always / so when we split it's going to give us a blank at the beginning
+//              so we need to get past that
+                keyPath = "";
+                if(tagName.equals(myKeys[1])){
+                    for(int j = 2; j < myKeys.length - 1; j++){
+                        keyPath += myKeys[j] + '/';
+                    }
+                } else {
+                    for(int j = 1; j < myKeys.length - 1; j++){
+                        keyPath += myKeys[j] + '/';
+                    }
+                }
+                keyPath += myKeys[myKeys.length - 1];
             }
-            System.out.println(tagName);
             if(tagName.equals("whatever")){
                 done = true;
             }

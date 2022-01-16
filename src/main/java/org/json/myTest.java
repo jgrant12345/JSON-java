@@ -5,7 +5,7 @@ import java.util.*;
 import static org.json.XML.parse;
 
 public class myTest {
-//Assumption1: don't start keypath with a /
+//Assumption1: don't have any empty keys, so no /catalog/book//hi or essentially no double slash
    public static void main(String[] args) throws FileNotFoundException {
        File myFile = new File("/Users/justin/IdeaProjects/JSON-java/src/main/java/org/json/sampleXML.xml");
        Reader myReader = new FileReader(myFile);
@@ -18,7 +18,7 @@ public class myTest {
 //              then, when we hit the closing tag of it, then we can print the contents. of course it can be tricky
 //              if there's an array. If there's a number passed into keypath, we can look for the nth iteration of that
 //
-               parse(x, jo, null, XMLParserConfiguration.KEEP_STRINGS,false, "catalog", "catalog");
+               parse(x, jo, null, XMLParserConfiguration.KEEP_STRINGS,false, "/catalog/hi/", "hi");
 //               System.out.println(jo);
            }
 
