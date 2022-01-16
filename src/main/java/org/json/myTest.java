@@ -18,7 +18,7 @@ public class myTest {
 //              then, when we hit the closing tag of it, then we can print the contents. of course it can be tricky
 //              if there's an array. If there's a number passed into keypath, we can look for the nth iteration of that
 //
-               parse(x, jo, null, XMLParserConfiguration.KEEP_STRINGS,false, "/catalog/hi/", "hi");
+               parse(x, jo, null, XMLParserConfiguration.KEEP_STRINGS,false, "/catalog/ho/yay", "yay");
 //               System.out.println(jo);
            }
 
