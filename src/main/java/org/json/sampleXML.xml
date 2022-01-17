@@ -1,10 +1,8 @@
-<catalog>
-    <book>
-        <arrayellement>
-            1
-        </arrayellement>
-        <arrayellement>
-            2
-        </arrayellement>
-    </book>
-</catalog>
+"<contact>
+    <nick>Crista </nick>
+     <name>Crista Lopes</name>
+     <address>
+         <street>Ave of Nowhere</street>
+         <zipcode>92614</zipcode>
+     </address>
+</contact>

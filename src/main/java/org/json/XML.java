@@ -348,13 +348,12 @@ public class XML {
 //          Note if we have reached our object in question and we have reached the end of that said object
 //          then we can print out the context and be done with it
 
-            if(arrayIsFound){
-                System.out.println(context);
-            }
 
             if(done && token.equals(lastKey)){
-                System.out.println(context);
-                System.exit(1);
+                JSONObject myObject = new JSONObject().put((String) token,context);
+                System.out.println(myObject);
+//               throw new early termination exception
+//                System.exit(1);
             }
 
             return true;
@@ -377,7 +376,7 @@ public class XML {
 
 //          if we're indexing an array
             if(isInt(myKeys[0])){
-                arrayIsFound = true;
+                lastKey = myKeys[0];
             } else {
                 if(!myKeys[0].equals("")){
 //              this means we are on the correct path so far
@@ -386,7 +385,6 @@ public class XML {
 //                    to signify that we have reached our object
 //                  we have found the beginning of the key
                         if(tagName.equals(lastKey)){
-                            System.out.println(keyPath);
                             done = true;
                         } else {
 //                       this is where we iterate to the next key. We haven't found it but we're going to the next
