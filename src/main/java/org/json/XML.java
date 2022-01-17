@@ -348,6 +348,9 @@ public class XML {
             if(keyPath.equals(currentKeyPath)){
                 JSONObject myObject;
                 Object myQuery = context.optQuery(new JSONPointer("/content"));
+//              this case only occurs if we end up querying for an object that isnt' a JSONObject
+//              e.g. Query: /catalog/book  XML: <catalog><book>author</book>/<catalog>
+//              would result in
                 if(myQuery != null && myQuery instanceof String){
                      myObject = new JSONObject().put((String) token,myQuery);
                 } else {
