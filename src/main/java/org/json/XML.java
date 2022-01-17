@@ -266,7 +266,8 @@ public class XML {
      * @return true if the close tag is processed.
      * @throws JSONException
      */
-    public static boolean parse(XMLTokener x, JSONObject context, String name, XMLParserConfiguration config, boolean done, String keyPath, String lastKey)
+    static boolean isgoingThroughArray = false;
+    public static boolean parse(XMLTokener x, JSONObject context, String name, XMLParserConfiguration config, boolean done, String keyPath, String lastKey, boolean arrayIsFound)
             throws JSONException {
         char c;
         int i;
@@ -347,10 +348,17 @@ public class XML {
 //          MYCODEHERE
 //          Note if we have reached our object in question and we have reached the end of that said object
 //          then we can print out the context and be done with it
+
+//            if(arrayIsFound){
+//                System.out.println(context.optQuery("/book/1"));
+//                System.out.println(context);
+//            }
+
             if(done && token.equals(lastKey)){
                 System.out.println(context);
                 System.exit(1);
             }
+
             return true;
 
         } else if (token instanceof Character) {
@@ -368,8 +376,11 @@ public class XML {
 
 //           WE CAN DO SOME WORK HERE: check the tagName to see if it's the correct tagname
             String[] myKeys = keyPath.split("/");
-//          if we're indexing an array
 
+//          if we're indexing an array
+            if(isInt(myKeys[0])){
+                arrayIsFound = true;
+            } else {
                 if(!myKeys[0].equals("")){
 //              this means we are on the correct path so far
                     if(tagName.equals(myKeys[0])){
@@ -377,6 +388,7 @@ public class XML {
 //                    to signify that we have reached our object
 //                  we have found the beginning of the key
                         if(tagName.equals(lastKey)){
+                            System.out.println(keyPath);
                             done = true;
                         } else {
 //                       this is where we iterate to the next key. We haven't found it but we're going to the next
@@ -394,6 +406,10 @@ public class XML {
 //              the first character is always / so when we split it's going to give us a blank at the beginning
 //              so we need to get past that
                     keyPath = "";
+//                  case for when there is only one key
+                    if(tagName.equals(myKeys[1]) && myKeys.length == 2){
+                        done = true;
+                    }
                     if(tagName.equals(myKeys[1])){
                         for(int j = 2; j < myKeys.length - 1; j++){
                             keyPath += myKeys[j] + '/';
@@ -405,7 +421,9 @@ public class XML {
                     }
                     keyPath += myKeys[myKeys.length - 1];
                 }
-            myKeys = keyPath.split("/");
+
+
+            }
 
 
 
@@ -503,7 +521,7 @@ public class XML {
                         } else if (token == LT) {
 //                            NOTE: Nested Element
                             // Nested element
-                            if (parse(x, jsonObject, tagName, config,done,keyPath, lastKey)) {
+                            if (parse(x, jsonObject, tagName, config,done,keyPath, lastKey, arrayIsFound)) {
                                 if (config.getForceList().contains(tagName)) {
                                     // Force the value to be an array
                                     if (jsonObject.length() == 0) {
@@ -762,7 +780,7 @@ public class XML {
         while (x.more()) {
             x.skipPast("<");
             if(x.more()) {
-                parse(x, jo, null, config,false, "/catalog/book", "hi");
+                parse(x, jo, null, config,false, "/catalog/book", "hi", false);
             }
         }
         return jo;

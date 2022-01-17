@@ -1,8 +1,5 @@
 <catalog>
     <book>
-        1
-    </book>
-    <book>
-        2
+        <another><path><here>yeppers</here></path></another>
     </book>
 </catalog>
