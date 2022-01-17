@@ -21,7 +21,7 @@ public class myTest {
 //              If that's the same, then we're done. we also need to stop one tag earler, then we can do all of the magic stuff with it
 //              For replacement, replace the object when hit the open tag, then call the skippast method skippast(</ +tagName +>
 //              then the rest will go well
-               parse(x, jo, null, XMLParserConfiguration.KEEP_STRINGS,false, "/contact/address/zipcode", "address", false);
+               parse(x, jo, null, XMLParserConfiguration.KEEP_STRINGS,false, "/catalog/address/", "/", "/");
 //               System.out.println(jo);
            }
 
