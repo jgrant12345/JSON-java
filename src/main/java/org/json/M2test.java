@@ -13,26 +13,26 @@ public class M2test {
                 "  <name>Crista Lopes</name>\n" +
                 "  <address>\n" +
                 "    <street>Ave of Nowhere</street>\n" +
-                "    <zipcode>92614</zipcode>\n" +
+                "    <zipcode><anotherone>test</anotherone></zipcode>\n" +
                 "  </address>\n" +
                 "</contact>";
 
-//        try {
-//            JSONObject jobj = XML.toJSONObject(new StringReader(xmlString), new JSONPointer("/contact/"));
-//            System.out.println(jobj);
-//        } catch (JSONException e) {
-//            System.out.println(e);
-//        }
-//
-//        System.out.println("-----------------------");
-
         try {
-            JSONObject replacement = XML.toJSONObject("<street>Ave of the Arts</street>\n");
-            System.out.println("Given replacement: " + replacement);
-            JSONObject jobj = XML.toJSONObject(new StringReader(xmlString), new JSONPointer("/contact/address/"), replacement);
+            JSONObject jobj = XML.toJSONObject(new StringReader(xmlString), new JSONPointer("/contact/address/street/"));
             System.out.println(jobj);
         } catch (JSONException e) {
             System.out.println(e);
         }
+//
+//        System.out.println("-----------------------");
+
+//        try {
+//            JSONObject replacement = XML.toJSONObject("<street>Ave of the Arts</street>\n");
+//            System.out.println("Given replacement: " + replacement);
+//            JSONObject jobj = XML.toJSONObject(new StringReader(xmlString), new JSONPointer("/contact/nick"), replacement);
+//            System.out.println(jobj);
+//        } catch (JSONException e) {
+//            System.out.println(e);
+//        }
     }
 }

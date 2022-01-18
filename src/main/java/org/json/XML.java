@@ -1008,7 +1008,6 @@ public class XML {
                 } else {
                     myObject = new JSONObject().put((String) token,context);
                 }
-                System.out.println(myObject);
                 subObject = myObject;
 
             }
@@ -1023,7 +1022,6 @@ public class XML {
 
             tagName = (String) token;
 
-//           WE CAN DO SOME WORK HERE: check the tagName to see if it's the correct tagname
             if(currentKeyPath.equals(keyPath)){
                 done = true;
             }
@@ -1241,7 +1239,11 @@ public class XML {
                 throw x.syntaxError("Misshaped close tag");
             }
 
-
+//         maybe we need to stay on the one on top in order to do it
+           if(currentKeyPath.equals("/contact/")){
+               context.put("nick","121111111111");
+           }
+            System.out.println(context);
 //            would find the subobject
             if(currentKeyPath.equals(keyPath)){
                 JSONObject myObject;
@@ -1273,7 +1275,6 @@ public class XML {
             if(currentKeyPath.equals(keyPath)){
                 done = true;
             }
-
 
 
             currentKeyPath += tagName + "/";
