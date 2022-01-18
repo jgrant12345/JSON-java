@@ -888,7 +888,9 @@ public class XML {
 // First part
     public static JSONObject subObject;
    public static JSONObject toJSONObject(Reader reader, JSONPointer path){
+
        String keyPath = path.toString();
+
        JSONObject jo = new JSONObject();
        XMLTokener x = new XMLTokener(reader);
        while (x.more()) {
@@ -903,15 +905,28 @@ public class XML {
 //  second part
     public static JSONObject toJSONObject(Reader reader, JSONPointer path, JSONObject replacement){
         String keyPath = path.toString();
+        String[] splitKeyPath = keyPath.split("/");
+//        base case. If we want to replace the top level item, then it's just the replacement object
+        if(splitKeyPath.length == 2){
+            return replacement;
+        }
+        String levelAboveKeypath = "";
+        for(int i = 0; i < splitKeyPath.length - 1; i++){
+            levelAboveKeypath += splitKeyPath[i] + '/';
+        }
+        String keyToQuery = splitKeyPath[splitKeyPath.length - 1];
+
         JSONObject jo = new JSONObject();
         XMLTokener x = new XMLTokener(reader);
         while (x.more()) {
             x.skipPast("<");
             if(x.more()) {
-                parse2(x, jo, null, XMLParserConfiguration.KEEP_STRINGS,false, keyPath, "/", replacement, false);
+                parse2(x, jo, null, XMLParserConfiguration.KEEP_STRINGS,false, keyPath, "/", replacement, levelAboveKeypath, keyToQuery);
             }
         }
-        return subObject;
+//      put the highest level key in
+        JSONObject myObject = new JSONObject().put( splitKeyPath[1],subObject);
+        return myObject;
 
     }
 
@@ -1159,7 +1174,9 @@ public class XML {
 
     }
 
-    public static boolean parse2(XMLTokener x, JSONObject context, String name, XMLParserConfiguration config, boolean done, String keyPath, String currentKeyPath, JSONObject replacement, boolean toSkipPast)
+// @params: keyPath: path to the JSON object that will be replace, currentKeyPath: while recursing, this is the path that the program is currently on, replacement, the object that will replace the object
+//  on the keypath, levelaboveKeyPath: the keypath that is one directory above where we are going to replace the object, keyToQuery: the key of the object we are replacing
+    public static boolean parse2(XMLTokener x, JSONObject context, String name, XMLParserConfiguration config, boolean done, String keyPath, String currentKeyPath, JSONObject replacement, String levelAboveKeyPath, String keyToQuery)
             throws JSONException {
         char c;
         int i;
@@ -1240,25 +1257,21 @@ public class XML {
             }
 
 //         maybe we need to stay on the one on top in order to do it
-           if(currentKeyPath.equals("/contact/")){
-               context.put("nick","121111111111");
+           if(currentKeyPath.equals(levelAboveKeyPath)){
+//             need to remove all the keys inside of this point
+//             also need to place all the keys at this point
+//             the "address here needs to be the key to the replacement
+               Iterator<String> myKeysIterator = replacement.keys();
+               context.remove(keyToQuery);
+               for (Iterator<String> myIterator = myKeysIterator; myIterator.hasNext(); ) {
+                   String myKey = myIterator.next();
+                   Object myQuery = replacement.optQuery(new JSONPointer('/' + myKey));
+                   context.put(myKey, myQuery);
+               }
+
            }
-            System.out.println(context);
-//            would find the subobject
-            if(currentKeyPath.equals(keyPath)){
-                JSONObject myObject;
-                Object myQuery = context.optQuery(new JSONPointer("/content"));
-//              this case only occurs if we end up querying for an object that isnt' a JSONObject
-//              e.g. Query: /catalog/book  XML: <catalog><book>author</book>/<catalog>
-//              would result in
-                if(myQuery != null && myQuery instanceof String){
-                    myObject = new JSONObject().put((String) token,myQuery);
-                } else {
-                    myObject = new JSONObject().put((String) token,context);
-                  JSONObject newObject =  myObject.put("address", replacement);
-                }
-                subObject = myObject;
-            }
+
+            subObject = context;
 
             return true;
 
@@ -1373,7 +1386,7 @@ public class XML {
                         } else if (token == LT) {
 //                            NOTE: Nested Element
                             // Nested element
-                            if (parse2(x, jsonObject, tagName, config,done,keyPath, currentKeyPath,replacement,false)) {
+                            if (parse2(x, jsonObject, tagName, config,done,keyPath, currentKeyPath,replacement,levelAboveKeyPath, keyToQuery)) {
                                 if (config.getForceList().contains(tagName)) {
                                     // Force the value to be an array
                                     if (jsonObject.length() == 0) {
