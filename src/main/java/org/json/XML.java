@@ -888,15 +888,18 @@ public class XML {
 // First part
     public static JSONObject subObject;
    public static JSONObject toJSONObject(Reader reader, JSONPointer path){
-
        String keyPath = path.toString();
-
        JSONObject jo = new JSONObject();
        XMLTokener x = new XMLTokener(reader);
        while (x.more()) {
            x.skipPast("<");
            if(x.more()) {
-               parse1(x, jo, null, XMLParserConfiguration.KEEP_STRINGS,false, keyPath, "/");
+               try {
+                   parse1(x, jo, null, XMLParserConfiguration.KEEP_STRINGS,false, keyPath, "/");
+               } catch(Exception e){
+
+               }
+
            }
        }
         return subObject;
@@ -935,7 +938,7 @@ public class XML {
 
     //    Parse 1
     public static boolean parse1(XMLTokener x, JSONObject context, String name, XMLParserConfiguration config, boolean done, String keyPath, String currentKeyPath)
-            throws JSONException {
+            throws Exception {
         char c;
         int i;
         JSONObject jsonObject = null;
@@ -1024,7 +1027,7 @@ public class XML {
                     myObject = new JSONObject().put((String) token,context);
                 }
                 subObject = myObject;
-
+                throw new Exception("Exception message");
             }
             return true;
 
@@ -1268,7 +1271,6 @@ public class XML {
                    Object myQuery = replacement.optQuery(new JSONPointer('/' + myKey));
                    context.put(myKey, myQuery);
                }
-
            }
 
             subObject = context;

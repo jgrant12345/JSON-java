@@ -17,19 +17,19 @@ public class M2test {
                 "  </address>\n" +
                 "</contact>";
 
-//        try {
-//            JSONObject jobj = XML.toJSONObject(new StringReader(xmlString), new JSONPointer("/contact/address/street/"));
-//            System.out.println(jobj);
-//        } catch (JSONException e) {
-//            System.out.println(e);
-//        }
-//
-//        System.out.println("-----------------------");
+        try {
+            JSONObject jobj = XML.toJSONObject(new StringReader(xmlString), new JSONPointer("/contact/address/street/"));
+            System.out.println(jobj);
+        } catch (JSONException e) {
+            System.out.println(e);
+        }
+
+        System.out.println("-----------------------");
 
         try {
             JSONObject replacement = XML.toJSONObject("<street>Ave of the Arts</street>\n");
             System.out.println("Given replacement: " + replacement);
-            JSONObject jobj = XML.toJSONObject(new StringReader(xmlString), new JSONPointer("/contact/name/"), replacement);
+            JSONObject jobj = XML.toJSONObject(new StringReader(xmlString), new JSONPointer("/contact/address/street/"), replacement);
             System.out.println(jobj);
         } catch (JSONException e) {
             System.out.println(e);
