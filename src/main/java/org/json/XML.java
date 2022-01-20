@@ -886,7 +886,10 @@ public class XML {
 
     }
 // First part
+// Static objects
     public static JSONObject subObject;
+    public static String firstkeyPath;
+
    public static JSONObject toJSONObject(Reader reader, JSONPointer path){
        String keyPath = path.toString();
        JSONObject jo = new JSONObject();
@@ -909,15 +912,19 @@ public class XML {
     public static JSONObject toJSONObject(Reader reader, JSONPointer path, JSONObject replacement){
         String keyPath = path.toString();
         String[] splitKeyPath = keyPath.split("/");
-//        base case. If we want to replace the top level item, then it's just the replacement object
-        if(splitKeyPath.length == 2){
-            return replacement;
-        }
+//       want to check for incorrect input
+//        if(splitKeyPath.length == 0){
+//            System.out.println("Please put in a valid key path");
+//            return null;
+//        }
         String levelAboveKeypath = "";
         for(int i = 0; i < splitKeyPath.length - 1; i++){
             levelAboveKeypath += splitKeyPath[i] + '/';
         }
-        String keyToQuery = splitKeyPath[splitKeyPath.length - 1];
+       String keyToQuery = "";
+        if(splitKeyPath.length != 0){
+             keyToQuery = splitKeyPath[splitKeyPath.length - 1];
+        }
 
         JSONObject jo = new JSONObject();
         XMLTokener x = new XMLTokener(reader);
@@ -927,8 +934,12 @@ public class XML {
                 parse2(x, jo, null, XMLParserConfiguration.KEEP_STRINGS,false, keyPath, "/", replacement, levelAboveKeypath, keyToQuery);
             }
         }
+        if(splitKeyPath.length == 2 && firstkeyPath.equals(splitKeyPath[1])){
+            return replacement;
+        }
 //      put the highest level key in
-        JSONObject myObject = new JSONObject().put( splitKeyPath[1],subObject);
+        System.out.println(firstkeyPath);
+        JSONObject myObject = new JSONObject().put(firstkeyPath,subObject);
         return myObject;
 
     }
@@ -1259,14 +1270,15 @@ public class XML {
                 throw x.syntaxError("Misshaped close tag");
             }
 
+
 //         maybe we need to stay on the one on top in order to do it
-           if(currentKeyPath.equals(levelAboveKeyPath)){
+           if(currentKeyPath.equals(levelAboveKeyPath)) {
 //             need to remove all the keys inside of this point
 //             also need to place all the keys at this point
 //             the "address here needs to be the key to the replacement
                Iterator<String> myKeysIterator = replacement.keys();
                context.remove(keyToQuery);
-               for (Iterator<String> myIterator = myKeysIterator; myIterator.hasNext(); ) {
+               for (Iterator<String> myIterator = myKeysIterator; myIterator.hasNext();) {
                    String myKey = myIterator.next();
                    Object myQuery = replacement.optQuery(new JSONPointer('/' + myKey));
                    context.put(myKey, myQuery);
@@ -1283,17 +1295,12 @@ public class XML {
             // Open tag <
 
         } else {
-
             tagName = (String) token;
-
-//           WE CAN DO SOME WORK HERE: check the tagName to see if it's the correct tagname
-            if(currentKeyPath.equals(keyPath)){
-                done = true;
+            if(currentKeyPath.equals("/")){
+                firstkeyPath = tagName;
             }
 
-
             currentKeyPath += tagName + "/";
-
 
 
             token = null;
