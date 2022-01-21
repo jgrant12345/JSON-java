@@ -29,13 +29,14 @@ public class M2test {
 //        }
 
         System.out.println("-----------------------");
-
+    JSONObject jobj = new JSONObject();
         try {
             JSONObject replacement = XML.toJSONObject("<street>Ave of the Arts</street>\n");
             System.out.println("Given replacement: " + replacement);
-            JSONObject jobj = XML.toJSONObject(new StringReader(xmlString), new JSONPointer("/"), replacement);
+            jobj = XML.toJSONObject(new StringReader(xmlString), new JSONPointer("/contact/address/street/"), replacement);
             System.out.println(jobj);
         } catch (JSONException e) {
+            System.out.println(jobj);
             System.out.println(e);
         }
     }

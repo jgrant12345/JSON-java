@@ -1286,7 +1286,9 @@ public class XML {
            }
 
             subObject = context;
-
+//            if(currentKeyPath.equals(keyPath)){
+//
+//            }
             return true;
 
         } else if (token instanceof Character) {
@@ -1301,6 +1303,16 @@ public class XML {
             }
 
             currentKeyPath += tagName + "/";
+//          we have to return because we already did the parsing We don't need to recurse again
+            if(currentKeyPath.contains(keyToQuery)){
+                x.skipPast("</"+tagName + ">");
+                return false;
+            }
+
+
+
+
+
 
 
             token = null;
