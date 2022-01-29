@@ -1300,6 +1300,11 @@ public class XML {
                 firstkeyPath = tagName;
             }
 
+            if(currentKeyPath.contains(keyToQuery)){
+                x.skipPast("</"+tagName + ">");
+                return false;
+            }
+
             currentKeyPath += tagName + "/";
 
 
